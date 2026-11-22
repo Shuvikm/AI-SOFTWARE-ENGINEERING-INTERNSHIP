@@ -1,69 +1,157 @@
-import Image from "next/image";
+import { AppShell } from "@/components/layout/AppShell";
+import { StatCard } from "@/components/dashboard/StatCard";
+import { ModelCard } from "@/components/models/ModelCard";
+import { TokenCostCalculator } from "@/components/dashboard/TokenCostCalculator";
+import { ModelRecommendationEngine } from "@/components/dashboard/ModelRecommendationEngine";
+import { BatmanHeroSection } from "@/components/hero/BatmanHeroSection";
+import { BatmanIntro } from "@/components/intro/BatmanIntro";
+import { ModelService } from "@/services/model.service";
+import {
+  Cpu,
+  Layers,
+  Building2,
+  Trophy,
+  ArrowRight,
+  TrendingUp,
+  Clock,
+  Award
+} from "lucide-react";
+import Link from "next/link";
 
-export default function Home() {
+export default async function DashboardPage() {
+  const stats = await ModelService.getDashboardStats();
+  const allModelsData = await ModelService.getAll({ limit: 100 });
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <>
+      {/* ── CINEMATIC BATMAN INTRO (Full-screen overlay, auto-dismisses after ~4s) ── */}
+      <BatmanIntro />
+
+      {/* ── BATMAN HERO SCENE (Full-viewport static scene after intro) ── */}
+      <BatmanHeroSection />
+
+      {/* 2. MAIN PLATFORM (Accessible by smooth scroll or clicking Explore) */}
+      <div id="platform-content">
+        <AppShell>
+          <div className="space-y-12">
+            {/* SCENE 5 — MAIN PLATFORM INTELLIGENCE TELEMETRY */}
+            <div id="intelligence-grid" className="pt-4 scroll-mt-20">
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <StatCard
+                  title="Total AI Models"
+                  value={stats.totalModels}
+                  subtext="Frontier & Open Weights"
+                  icon={Cpu}
+                  color="amber"
+                />
+                <StatCard
+                  title="Active Providers"
+                  value={stats.totalProviders}
+                  subtext="Cloud & direct APIs"
+                  icon={Layers}
+                  color="amber"
+                />
+                <StatCard
+                  title="AI Research Labs"
+                  value={stats.totalCompanies}
+                  subtext="Anthropic, OpenAI, Meta, Google"
+                  icon={Building2}
+                  color="amber"
+                />
+                <StatCard
+                  title="Evaluated Benchmarks"
+                  value={stats.totalBenchmarks}
+                  subtext="MMLU, GPQA, SWE-bench"
+                  icon={Trophy}
+                  color="amber"
+                />
+              </div>
+            </div>
+
+            {/* Interactive Modules: Recommendation & Token Pricing Calculator */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <ModelRecommendationEngine allModels={allModelsData.models} />
+              <TokenCostCalculator models={allModelsData.models} />
+            </div>
+
+            {/* Model Showcases */}
+            <div className="space-y-8">
+              {/* Top Reasoning Models */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-amber-400" />
+                    <h2 className="text-xl font-bold text-white font-mono uppercase tracking-wider">
+                      Top-Performing Frontier Models
+                    </h2>
+                  </div>
+                  <Link
+                    href="/rankings"
+                    className="text-xs font-mono uppercase font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    Full Leaderboard
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {stats.topPerformingModels.map((model) => (
+                    <ModelCard key={model.id} model={model} />
+                  ))}
+                </div>
+              </section>
+
+              {/* Trending & High Adoption Models */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-amber-400" />
+                    <h2 className="text-xl font-bold text-white font-mono uppercase tracking-wider">
+                      Trending Community Models
+                    </h2>
+                  </div>
+                  <Link
+                    href="/models?sortBy=popularity"
+                    className="text-xs font-mono uppercase font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    View Trending
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {stats.popularModels.map((model) => (
+                    <ModelCard key={model.id} model={model} />
+                  ))}
+                </div>
+              </section>
+
+              {/* Recently Added Frontier Models */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-amber-400" />
+                    <h2 className="text-xl font-bold text-white font-mono uppercase tracking-wider">
+                      Recently Released AI Models
+                    </h2>
+                  </div>
+                  <Link
+                    href="/models?sortBy=releaseDate"
+                    className="text-xs font-mono uppercase font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1"
+                  >
+                    View All Releases
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {stats.recentlyAddedModels.map((model) => (
+                    <ModelCard key={model.id} model={model} />
+                  ))}
+                </div>
+              </section>
+            </div>
+          </div>
+        </AppShell>
+      </div>
+    </>
   );
 }

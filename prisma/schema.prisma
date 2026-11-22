@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  username     String   @unique
+  passwordHash String
+  name         String?
+  role         String   @default("operator") // operator, researcher, admin
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  website     String?
+  logo        String?
+  sourceUrl   String?
+  verified    Boolean  @default(true)
+  models      Model[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Provider {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  slug        String          @unique
+  website     String?
+  description String?
+  sourceUrl   String?
+  verified    Boolean         @default(true)
+  models      Model[]
+  hostedModels ModelProvider[]
+  pricings    ModelPricing[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model Model {
+  id              String          @id @default(cuid())
+  name            String
+  slug            String          @unique
+  description     String?
+  modelType       String
+  contextWindow   Int
+  inputPrice      Float
+  outputPrice     Float
+  capabilities    String[]
+  modalities      String[]
+  releaseDate     DateTime?
+  companyId       String
+  providerId      String?
+  sourceUrl       String?
+  dataStatus      String          @default("verified") // verified, unverified, outdated
+  lastVerifiedAt  DateTime?       @default(now())
+
+  company         Company         @relation(fields: [companyId], references: [id])
+  provider        Provider?       @relation(fields: [providerId], references: [id])
+  hostedProviders ModelProvider[]
+  benchmarks      ModelBenchmark[]
+  pricings        ModelPricing[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([companyId])
+  @@index([providerId])
+  @@index([modelType])
+}
+
+model ModelProvider {
+  id          String   @id @default(cuid())
+  modelId     String
+  providerId  String
+  endpointUrl String?
+  isPrimary   Boolean  @default(false)
+  status      String   @default("active") // active, deprecated, beta
+  sourceUrl   String?
+  createdAt   DateTime @default(now())
+
+  model       Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  provider    Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([modelId, providerId])
+  @@index([providerId])
+}
+
+model ModelPricing {
+  id              String   @id @default(cuid())
+  modelId         String
+  providerId      String?
+  inputPricePerM  Float    // USD per 1M tokens
+  outputPricePerM Float    // USD per 1M tokens
+  currency        String   @default("USD")
+  pricingUnit     String   @default("1M tokens")
+  effectiveDate   DateTime @default(now())
+  sourceUrl       String?
+  verified        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  model           Model    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  provider        Provider? @relation(fields: [providerId], references: [id], onDelete: SetNull)
+
+  @@index([modelId])
+  @@index([providerId])
+}
+
+model Benchmark {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  description String?
+  category    String?
+  scoringScale String?        @default("0-100 percentage")
+  sourceUrl   String?
+  models      ModelBenchmark[]
+  createdAt   DateTime        @default(now())
+}
+
+model ModelBenchmark {
+  id            String    @id @default(cuid())
+  modelId       String
+  benchmarkId   String
+  score         Float
+  rank          Int?
+  scoringScale  String?   @default("0-100 percentage")
+  methodology   String?   // e.g. "5-shot CoT", "pass@1", "0-shot"
+  evalDate      DateTime?
+  sourceUrl     String?
+  verified      Boolean   @default(true)
+
+  model         Model     @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  benchmark     Benchmark @relation(fields: [benchmarkId], references: [id], onDelete: Cascade)
+
+  @@unique([modelId, benchmarkId])
+  @@index([benchmarkId])
+}
