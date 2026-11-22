@@ -1,0 +1,12 @@
+{
+  "name": "oneatlas-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix oneatlas run dev",
+    "build": "npm --prefix oneatlas run build",
+    "start": "npm --prefix oneatlas run start",
+    "lint": "npm --prefix oneatlas run lint",
+    "db:seed": "npm --prefix oneatlas run db:seed"
+  }
+}
