@@ -56,25 +56,31 @@ export function BatmanHeroSection() {
       cloudsTL.to("#cloudStart-L", { x: -280, opacity: 0, ease: "none", force3D: true }, 0);
       cloudsTL.to("#cloudStart-R", { x: 280, opacity: 0, ease: "none", force3D: true }, 0);
 
-      // Hero Center text badge parallax
+      // Hero Center text badge stays clean and readable initially, then fades gently as clouds disperse
+      gsap.fromTo(
+        ".center-hero-badge",
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }
+      );
+
       gsap.to(".center-hero-badge", {
-        y: -140,
+        y: -120,
         opacity: 0,
-        scale: 0.94,
-        ease: "power1.out",
+        scale: 0.95,
+        ease: "power1.inOut",
         force3D: true,
         scrollTrigger: {
           trigger: ".parallaxScrollElement",
-          start: "5% top",
-          end: "35% top",
-          scrub: 0.8,
+          start: "30% top",
+          end: "70% top",
+          scrub: 1,
         },
       });
 
-      // Immediate Scroll-Gate: trigger authentication modal right when starting to scroll
+      // Smooth Scroll-Gate: triggers ONLY AFTER the user clearly sees Batman and the clouds drift
       ScrollTrigger.create({
         trigger: ".parallaxScrollElement",
-        start: "8% top",
+        start: "75% top",
         onEnter: () => {
           const user = localStorage.getItem("oneatlas_user");
           if (!user) {
@@ -346,8 +352,8 @@ export function BatmanHeroSection() {
         </footer>
       </div>
 
-      {/* ── LIGHTWEIGHT SMOOTH SCROLL TRACK (No heavy layers, no lag) ── */}
-      <div className="parallaxScrollElement relative w-full h-[1200px] pointer-events-none" />
+      {/* ── LIGHTWEIGHT SMOOTH SCROLL TRACK (Sufficient space to view Batman & Clouds) ── */}
+      <div className="parallaxScrollElement relative w-full h-[2200px] pointer-events-none" />
     </div>
   );
 }
