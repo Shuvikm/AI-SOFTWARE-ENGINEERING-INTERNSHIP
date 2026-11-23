@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Pool } from "pg";
 import crypto from "crypto";
+import dns from "dns";
+
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -93,10 +98,11 @@ export async function POST(request: NextRequest) {
         },
       });
     }
-  } catch (error) {
-    console.error("Auth API error:", error);
+  } catch (error: any) {
+    console.error("Auth API error:", error?.message || error);
+    const detail = error?.message ? `: ${error.message}` : "";
     return NextResponse.json(
-      { error: "Database authentication failure. Please check your credentials." },
+      { error: `Database error${detail}. Please check connection or credentials.` },
       { status: 500 }
     );
   }

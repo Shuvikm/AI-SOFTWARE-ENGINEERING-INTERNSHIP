@@ -1,6 +1,12 @@
 import { PrismaClient } from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import dns from "dns";
+
+// Prefer IPv4 for node TCP sockets to avoid IPv6 timeouts on local networks connecting to AWS Neon
+if (typeof dns.setDefaultResultOrder === "function") {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -23,8 +29,8 @@ export function getPrismaClient(): PrismaClient | null {
       new Pool({
         connectionString,
         max: 5,
-        idleTimeoutMillis: 15000,
-        connectionTimeoutMillis: 3000, // Faster failover to instant fallback when Neon sleeps
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
       });
 
     const adapter = new PrismaPg(pool);

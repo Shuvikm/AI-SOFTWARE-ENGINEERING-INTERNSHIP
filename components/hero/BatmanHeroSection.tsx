@@ -47,33 +47,34 @@ export function BatmanHeroSection() {
       });
 
       // Floating white clouds diverge smoothly as you scroll down
-      cloudsTL.to("#cloud1", { x: 450, ease: "none" }, 0);
-      cloudsTL.to("#cloud2", { x: 800, ease: "none" }, 0);
-      cloudsTL.to("#cloud3", { x: -800, ease: "none" }, 0);
-      cloudsTL.to("#cloud4", { x: -550, y: 35, ease: "none" }, 0);
-      cloudsTL.to("#cloudsBig-L", { x: -350, y: 150, opacity: 0.1, ease: "none" }, 0);
-      cloudsTL.to("#cloudsBig-R", { x: 350, y: 150, opacity: 0.1, ease: "none" }, 0);
-      cloudsTL.to("#cloudStart-L", { x: -280, opacity: 0, ease: "none" }, 0);
-      cloudsTL.to("#cloudStart-R", { x: 280, opacity: 0, ease: "none" }, 0);
+      cloudsTL.to("#cloud1", { x: 450, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloud2", { x: 800, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloud3", { x: -800, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloud4", { x: -550, y: 35, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloudsBig-L", { x: -350, y: 150, opacity: 0.1, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloudsBig-R", { x: 350, y: 150, opacity: 0.1, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloudStart-L", { x: -280, opacity: 0, ease: "none", force3D: true }, 0);
+      cloudsTL.to("#cloudStart-R", { x: 280, opacity: 0, ease: "none", force3D: true }, 0);
 
       // Hero Center text badge parallax
       gsap.to(".center-hero-badge", {
-        y: -180,
+        y: -140,
         opacity: 0,
-        scale: 0.92,
+        scale: 0.94,
         ease: "power1.out",
+        force3D: true,
         scrollTrigger: {
           trigger: ".parallaxScrollElement",
-          start: "15% top",
-          end: "50% top",
-          scrub: 1,
+          start: "5% top",
+          end: "35% top",
+          scrub: 0.8,
         },
       });
 
-      // Automatic Scroll-Gate: trigger authentication modal
+      // Immediate Scroll-Gate: trigger authentication modal right when starting to scroll
       ScrollTrigger.create({
         trigger: ".parallaxScrollElement",
-        start: "60% top",
+        start: "8% top",
         onEnter: () => {
           const user = localStorage.getItem("oneatlas_user");
           if (!user) {
@@ -167,9 +168,9 @@ export function BatmanHeroSection() {
           </div>
         </div>
 
-        {/* 2. PURE WHITE CLOUDS SVG PARALLAX (Only crisp white clouds — No pink, no mountains, no lag) */}
+        {/* 2. PURE WHITE CLOUDS SVG PARALLAX (Only crisp white clouds — Hardware accelerated, zero lag) */}
         <svg
-          className="parallax absolute inset-0 w-full h-full z-20 pointer-events-none"
+          className="parallax absolute inset-0 w-full h-full z-20 pointer-events-none transform-gpu will-change-transform"
           viewBox="0 0 750 500"
           preserveAspectRatio="xMidYMax slice"
         >
@@ -346,7 +347,7 @@ export function BatmanHeroSection() {
       </div>
 
       {/* ── LIGHTWEIGHT SMOOTH SCROLL TRACK (No heavy layers, no lag) ── */}
-      <div className="parallaxScrollElement relative w-full h-[1800px] pointer-events-none" />
+      <div className="parallaxScrollElement relative w-full h-[1200px] pointer-events-none" />
     </div>
   );
 }
